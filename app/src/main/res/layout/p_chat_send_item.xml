@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp"
+    android:paddingRight="@dimen/padding_micro">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/send_msg_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/lv_msg_sent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/ic_chat_student_bubble">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:drawablePadding="4dp"
+                android:padding="4dp"
+                android:textColor="#D2D2D2"
+                android:textSize="12sp"
+                tools:text="02:32 PM" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:maxWidth="250dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="4dp"
+                android:paddingTop="2dp"
+                android:textColor="#343434"
+                android:textSize="14sp"
+                tools:text="Hey wassup, how are you? Wanna talk to an IITian? Tell me yo your problem                " />
+
+        </FrameLayout>
+
+        <!-- <haygot.togyah.app.widget.TextView.TextViewRegular
+             android:id="@+id/tv_timestamp"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentEnd="true"
+             android:layout_alignParentRight="true"
+             android:layout_below="@id/lv_msg_sent"
+             android:layout_marginTop="5dp"
+             android:drawablePadding="@dimen/padding_micro"
+             android:textColor="#D2D2D2"
+             android:textSize="10sp"
+             tools:text="02:32 PM" />-->
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/tv_retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/lv_msg_sent"
+            android:layout_marginTop="3dp"
+            android:text="Tap to Retry"
+            android:textColor="#EF4B53"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </RelativeLayout>
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/msg_error_layout"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_centerVertical="true">-->
+
+    <!--<ImageView-->
+    <!--android:id="@+id/iv_msg_error"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginLeft="8dp"-->
+    <!--android:src="@drawable/ic_error"-->
+    <!--tools:visibility="visible" />-->
+    <!--</RelativeLayout>-->
+
+</RelativeLayout>

@@ -1,0 +1,35 @@
+*.iml
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/captures
+
+# Built application files
+build/
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+
+
+# Gradle generated files
+.gradle
+.gradle/
+gradle/
+
+# User-specific configurations
+.idea
+/.idea/workspace.xml
+/.idea/libraries
+
+#Signing Passwords
+gradle.properties
