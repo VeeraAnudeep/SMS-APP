@@ -8,7 +8,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,8 +16,11 @@ import android.view.MenuItem;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import veera.smartmessager.marshmallowPermissions.ActivityManagePermission;
+import veera.smartmessager.marshmallowPermissions.PermissionResult;
+import veera.smartmessager.marshmallowPermissions.PermissionUtils;
 
-public class MainActivity extends AppCompatActivity implements MainView, LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends ActivityManagePermission implements MainView, LoaderManager.LoaderCallbacks<Cursor> {
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
@@ -42,13 +44,27 @@ public class MainActivity extends AppCompatActivity implements MainView, LoaderM
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        checkForPermissions();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mainPresenter = new MainPresenterImpl(this);
         mainAdapter = new MainAdapter(this);
         recyclerView.setAdapter(mainAdapter);
-        getSupportLoaderManager().initLoader(1, null, this);
+    }
+
+    private void checkForPermissions() {
+        askCompactPermissions(new String[]{PermissionUtils.Manifest_READ_SMS, PermissionUtils.Manifest_RECEIVE_SMS}, new PermissionResult() {
+            @Override
+            public void permissionGranted() {
+                getSupportLoaderManager().initLoader(1, null, MainActivity.this);
+            }
+
+            @Override
+            public void permissionDenied() {
+                finish();
+            }
+        });
     }
 
     @Override

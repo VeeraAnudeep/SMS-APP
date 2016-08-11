@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.telephony.SmsMessage;
 import android.util.Log;
@@ -49,9 +48,8 @@ public class IncomingSmsReceiver extends BroadcastReceiver {
 
                     Toast.makeText(context, phoneNumber + " :" + message, Toast.LENGTH_SHORT).show();
                     notificationBuilder
-                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setSmallIcon(R.drawable.ic_launcher)
                             .setTicker(message)
-                            .setColor(ContextCompat.getColor(context, R.color.colorAccent))
                             .setContentTitle(phoneNumber)
                             .setContentText(message)
                             .setNumber(0)
