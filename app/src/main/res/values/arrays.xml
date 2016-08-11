@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="random_background">
+        <item>@drawable/shape_circle_blue</item>
+        <item>@drawable/shape_circle_red</item>
+        <item>@drawable/shape_circle_purple</item>
+    </string-array>
+</resources>
