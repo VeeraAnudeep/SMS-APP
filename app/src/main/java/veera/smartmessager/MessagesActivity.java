@@ -1,5 +1,6 @@
 package veera.smartmessager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,11 +12,15 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,6 +35,9 @@ public class MessagesActivity extends AppCompatActivity implements LoaderManager
 
     @BindView(R.id.et_chat_msg)
     EditText editText;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     @BindView(R.id.iv_send_msg)
     ImageView sendMessage;
@@ -48,6 +56,11 @@ public class MessagesActivity extends AppCompatActivity implements LoaderManager
         sendMessage.setOnClickListener(this);
         Intent intent = getIntent();
         address = intent.getStringExtra("address");
+        toolbar.setTitle(address);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         getSupportLoaderManager().initLoader(2, null, this);
     }
 
@@ -67,15 +80,33 @@ public class MessagesActivity extends AppCompatActivity implements LoaderManager
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public boolean hasTelephony() {
+
+        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+        return !(telephonyManager == null || telephonyManager.getSimState() != TelephonyManager.SIM_STATE_READY);
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_send_msg:
-                String message = editText.getText().toString().trim();
-                if (TextUtils.isEmpty(message)) {
-                    return;
+                    String message = editText.getText().toString().trim();
+                    if (TextUtils.isEmpty(message)) {
+                        return;
+                    }
+                    SmsManager smsManager = SmsManager.getDefault();
+                if (hasTelephony()) {
+                    smsManager.sendTextMessage(address, null, message, null, null);
+                } else {
+                    Toast.makeText(this, "Make sure you have sim ready to send a message", Toast.LENGTH_SHORT).show();
                 }
-                SmsManager smsManager = SmsManager.getDefault();
-                smsManager.sendTextMessage(address, null, message, null, null);
                 break;
         }
     }

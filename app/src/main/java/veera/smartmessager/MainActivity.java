@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -33,8 +34,8 @@ public class MainActivity extends ActivityManagePermission implements MainView, 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
 
-    MainPresenter mainPresenter;
-    MainAdapter mainAdapter;
+    private MainPresenter mainPresenter;
+    private MainAdapter mainAdapter;
     final Uri CONTENT_URI = Telephony.Sms.CONTENT_URI;
     final String SORT_ORDER = Telephony.Sms.DEFAULT_SORT_ORDER;
     final String[] PROJECTION = {
@@ -45,6 +46,7 @@ public class MainActivity extends ActivityManagePermission implements MainView, 
             Telephony.Sms.ADDRESS,
             Telephony.Sms.BODY,
     };
+    private String queryText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,16 +112,26 @@ public class MainActivity extends ActivityManagePermission implements MainView, 
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(args!=null){
-            String query = args.getString("query");
+        String query;
+        String selection;
+        if (args != null) {
+            query = args.getString("query");
+            selection = Telephony.Sms.BODY + " LIKE ?";
+            return new CursorLoader(this, CONTENT_URI, PROJECTION, selection, new String[]{"%" + query + "%"}, SORT_ORDER);
+        } else {
+            selection = Telephony.Sms.THREAD_ID + " NOT NULL) GROUP BY (" + Telephony.Sms.THREAD_ID;
+            return new CursorLoader(this, CONTENT_URI, PROJECTION, selection, null, SORT_ORDER);
         }
-        String selection = Telephony.Sms.THREAD_ID + " NOT NULL) GROUP BY (" + Telephony.Sms.THREAD_ID;
-        return new CursorLoader(this, CONTENT_URI, PROJECTION, selection, null, SORT_ORDER);
+
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mainAdapter.setCursor(data);
+        if (!TextUtils.isEmpty(queryText)) {
+            mainAdapter.setCursor(data, queryText);
+        } else {
+            mainAdapter.setCursor(data, "");
+        }
     }
 
     @Override
@@ -141,9 +153,14 @@ public class MainActivity extends ActivityManagePermission implements MainView, 
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Bundle bundle = new Bundle();
-        bundle.putString("query", newText);
-        getSupportLoaderManager().restartLoader(CURSOR_ID, bundle, this);
+        queryText = newText;
+        if (!TextUtils.isEmpty(newText)) {
+            Bundle bundle = new Bundle();
+            bundle.putString("query", newText);
+            getSupportLoaderManager().restartLoader(CURSOR_ID, bundle, this);
+        } else {
+            getSupportLoaderManager().restartLoader(CURSOR_ID, null, this);
+        }
         return false;
     }
 }
