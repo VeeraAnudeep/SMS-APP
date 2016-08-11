@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.Telephony;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private LayoutInflater inflater;
     final int MESSAGE_SENT = 2;
     final int MESSAGE_RECEIVED = 1;
-
+    public static final String HTML_NON_BREAKING_SPACES_FOR_SEND = " &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
+    public static final String HTML_NON_BREAKING_SPACES_FOR_RECEIVE = " &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
 
     public MessagesAdapter(Context context) {
         inflater = LayoutInflater.from(context);
@@ -64,7 +66,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof MessageHolder) {
             MessageHolder viewHolder = (MessageHolder) holder;
-            viewHolder.message.setText(cursor.getString(cursor.getColumnIndex(Telephony.Sms.BODY)));
+            String message = cursor.getString(cursor.getColumnIndex(Telephony.Sms.BODY));
+            viewHolder.message.setText(Html.fromHtml(message + HTML_NON_BREAKING_SPACES_FOR_RECEIVE));
             viewHolder.timestamp.setText(Utils.getDate(cursor.getLong(cursor.getColumnIndex(Telephony.Sms.DATE)), "dd MMM"));
         }
     }

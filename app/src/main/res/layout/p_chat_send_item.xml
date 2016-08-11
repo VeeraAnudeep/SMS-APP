@@ -12,21 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <FrameLayout
             android:id="@+id/lv_msg_sent"
-            android:layout_width="240dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:background="@drawable/ic_chat_student_bubble"
-            android:gravity="end">
+            android:background="@drawable/ic_chat_send_bubble">
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/timestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_below="@+id/message"
                 android:layout_gravity="end|bottom"
                 android:drawablePadding="4dp"
                 android:padding="4dp"
@@ -46,9 +43,9 @@
                 android:paddingTop="2dp"
                 android:textColor="#343434"
                 android:textSize="14sp"
-                tools:text="Hello there !" />
+                tools:text="Hey wassup, how are you?                " />
 
-        </RelativeLayout>
+        </FrameLayout>
 
         <!-- <haygot.togyah.app.widget.TextView.TextViewRegular
              android:id="@+id/tv_timestamp"

@@ -70,7 +70,7 @@
                 android:layout_marginStart="@dimen/margin_micro"
                 android:background="@drawable/shape_circle_blue"
                 android:padding="@dimen/padding_micro"
-                android:src="@drawable/selector_doc_msg_send" />
+                android:src="@drawable/selector_msg_send" />
 
         </LinearLayout>
     </RelativeLayout>
