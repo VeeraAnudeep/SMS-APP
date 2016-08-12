@@ -31,6 +31,6 @@
         android:paddingTop="2dp"
         android:textColor="#212121"
         android:textSize="14sp"
-        tools:text="Hey How are you doing?" />
+        tools:text="Hey How are you doing?                     " />
 
 </FrameLayout>
