@@ -1,4 +1,4 @@
-package veera.smartmessager;
+package veera.smartmessager.activities;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -19,7 +19,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,18 +48,23 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import veera.smartmessager.ClickListener;
+import veera.smartmessager.R;
+import veera.smartmessager.adapters.MainAdapter;
 import veera.smartmessager.marshmallowPermissions.ActivityManagePermission;
 import veera.smartmessager.marshmallowPermissions.PermissionResult;
 import veera.smartmessager.marshmallowPermissions.PermissionUtils;
 
-public class MainActivity extends ActivityManagePermission implements MainView,
+public class MainActivity extends ActivityManagePermission implements ClickListener,
         SearchView.OnQueryTextListener, LoaderManager.LoaderCallbacks<Cursor>,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    public static final String TAG = "loo";
+    public static final String TAG = MainActivity.class.getSimpleName();
 
     public static final int CURSOR_ID = 1;
+    public static final String QUERY = "query";
+    public static final String ADDRESS = "address";
     @BindView(R.id.fab)
     FloatingActionButton fab;
 
@@ -69,22 +73,23 @@ public class MainActivity extends ActivityManagePermission implements MainView,
 
     private static final int REQUEST_CODE = 101;
     public ArrayList<String> smsBuffer = new ArrayList<>();
-    String smsFile = "SMS" + ".csv";
-    File backUpSms;
+    private String smsFile = "SMS" + ".csv";
+    private File backUpSms;
     private GoogleApiClient googleApiClient;
-    public static String drive_id;
-    public static DriveId driveID;
+    public String drive_id;
+    public DriveId driveID;
 
     private MainAdapter mainAdapter;
     final Uri CONTENT_URI = Telephony.Sms.CONTENT_URI;
     final String SORT_ORDER = Telephony.Sms.DEFAULT_SORT_ORDER;
     final String[] PROJECTION = {
-            Telephony.Sms.DATE,
-            Telephony.Sms.THREAD_ID,
             Telephony.Sms._ID,
-            Telephony.Sms.PERSON,
+            Telephony.Sms.THREAD_ID,
             Telephony.Sms.ADDRESS,
+            Telephony.Sms.PERSON,
+            Telephony.Sms.DATE,
             Telephony.Sms.BODY,
+            Telephony.Sms.TYPE
     };
     private String queryText;
 
@@ -100,20 +105,6 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         mainAdapter = new MainAdapter(this);
         recyclerView.setAdapter(mainAdapter);
         fab.setOnClickListener(this);
-    }
-
-    private void checkForPermissions() {
-        askCompactPermissions(new String[]{PermissionUtils.Manifest_READ_SMS, PermissionUtils.Manifest_RECEIVE_SMS}, new PermissionResult() {
-            @Override
-            public void permissionGranted() {
-                getSupportLoaderManager().initLoader(CURSOR_ID, null, MainActivity.this);
-            }
-
-            @Override
-            public void permissionDenied() {
-                finish();
-            }
-        });
     }
 
     @Override
@@ -137,11 +128,6 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         if (id == R.id.sync) {
             checkForStoragePermissions();
             return true;
@@ -150,6 +136,10 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Marshmallow Runtime Permission Handling
+     * #READ and WRITE to STORAGE
+     */
     private void checkForStoragePermissions() {
         askCompactPermissions(new String[]{PermissionUtils.Manifest_READ_EXTERNAL_STORAGE, PermissionUtils.Manifest_WRITE_EXTERNAL_STORAGE}, new PermissionResult() {
             @Override
@@ -164,17 +154,36 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         });
     }
 
-    @Override
-    public void setItems(Cursor cursor) {
+    /**
+     * Marshmallow Runtime Permission Handling
+     * #READ_SMS & #WRITE_SMS
+     */
+    private void checkForPermissions() {
+        askCompactPermissions(new String[]{PermissionUtils.Manifest_READ_SMS, PermissionUtils.Manifest_RECEIVE_SMS}, new PermissionResult() {
+            @Override
+            public void permissionGranted() {
+                getSupportLoaderManager().initLoader(CURSOR_ID, null, MainActivity.this);
+            }
 
+            @Override
+            public void permissionDenied() {
+                finish();
+            }
+        });
     }
+
+    /**
+     * Depending on the requirement returns the cursor loader in case of
+     *
+     * @param args Bundle when not null returns the search results loader
+     */
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String query;
         String selection;
         if (args != null) {
-            query = args.getString("query");
+            query = args.getString(QUERY);
             selection = Telephony.Sms.BODY + " LIKE ?";
             return new CursorLoader(this, CONTENT_URI, PROJECTION, selection, new String[]{"%" + query + "%"}, SORT_ORDER);
         } else {
@@ -184,6 +193,9 @@ public class MainActivity extends ActivityManagePermission implements MainView,
 
     }
 
+    /**
+     * @param data returns the cursor upon load finish which is set to the adapter
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (!TextUtils.isEmpty(queryText)) {
@@ -198,10 +210,16 @@ public class MainActivity extends ActivityManagePermission implements MainView,
 
     }
 
+    /**
+     * Starts the activity #MessagesActivity
+     * which is the complete messages thread of corresponding sender
+     *
+     * @param address is the contact or Number of the sender
+     */
     @Override
-    public void onClick(int position, String address) {
+    public void onClick(String address) {
         Intent intent = new Intent(this, MessagesActivity.class);
-        intent.putExtra("address", address);
+        intent.putExtra(ADDRESS, address);
         startActivity(intent);
     }
 
@@ -210,29 +228,38 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         return false;
     }
 
+
+    /**
+     * Restarts the Cursor Loader on search
+     *
+     * @param newText is the search query
+     */
     @Override
     public boolean onQueryTextChange(String newText) {
         queryText = newText;
+        Bundle bundle = null;
         if (!TextUtils.isEmpty(newText)) {
-            Bundle bundle = new Bundle();
-            bundle.putString("query", newText);
-            getSupportLoaderManager().restartLoader(CURSOR_ID, bundle, this);
-        } else {
-            getSupportLoaderManager().restartLoader(CURSOR_ID, null, this);
+            bundle = new Bundle();
+            bundle.putString(QUERY, newText);
         }
+        getSupportLoaderManager().restartLoader(CURSOR_ID, bundle, this);
         return false;
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
+        /**Disconnecting Google API client*/
         if (googleApiClient != null) {
             googleApiClient.disconnect();
         }
     }
 
 
-    /*Handles onConnectionFailed callbacks*/
+    /**
+     * Handles onConnectionFailed callbacks
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
@@ -242,99 +269,24 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         }
     }
 
-    /* *//*handles connection callbacks*/
+    /**
+     * handles connection callbacks
+     */
     @Override
     public void onConnected(Bundle bundle) {
         Drive.DriveApi.newDriveContents(googleApiClient).setResultCallback(driveContentsCallback);
     }
 
-    /*handles suspended connection callbacks*/
+    /**
+     * handles suspended connection callbacks
+     */
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.i("v", "Error creating new file contents");
     }
 
-    /*callback on getting the drive contents, contained in result*/
-    final private ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback = new
-            ResultCallback<DriveApi.DriveContentsResult>() {
-                @Override
-                public void onResult(@NonNull DriveApi.DriveContentsResult result) {
-                    if (!result.getStatus().isSuccess()) {
-                        Log.i(TAG, "Error creating new file contents");
-                        return;
-                    }
-                    final DriveContents driveContents = result.getDriveContents();
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            OutputStream outputStream = driveContents.getOutputStream();
-                            backupSMS();
-                            addTextfileToOutputStream(outputStream);
-                            MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                                    .setTitle("testFile")
-                                    .setMimeType("text/plain")
-                                    .setDescription("This is a text file uploaded from device")
-                                    .setStarred(true).build();
-                            Drive.DriveApi.getRootFolder(googleApiClient)
-                                    .createFile(googleApiClient, changeSet, driveContents)
-                                    .setResultCallback(fileCallback);
-                        }
-
-                    }.start();
-                }
-            };
-
-    /*get input stream from text file, read it and put into the output stream*/
-    private void addTextfileToOutputStream(OutputStream outputStream) {
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        try {
-            BufferedInputStream inputStream = new BufferedInputStream(
-                    new FileInputStream(backUpSms));
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException e) {
-            Log.i(TAG, "problem converting input stream to output stream: " + e);
-            e.printStackTrace();
-        }
-    }
-
-    /*callback after creating the file, can get file info out of the result*/
-    final private ResultCallback<DriveFolder.DriveFileResult> fileCallback = new
-            ResultCallback<DriveFolder.DriveFileResult>() {
-                @Override
-                public void onResult(@NonNull DriveFolder.DriveFileResult result) {
-                    if (!result.getStatus().isSuccess()) {
-                        Log.i(TAG, "Error creating the file");
-                        Toast.makeText(MainActivity.this,
-                                "Error adding file to Drive", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Log.i(TAG, "File added to Drive");
-                    Log.i(TAG, "Created a file with content: "
-                            + result.getDriveFile().getDriveId());
-                    Toast.makeText(MainActivity.this,
-                            "File successfully added to Drive", Toast.LENGTH_SHORT).show();
-                    final PendingResult<DriveResource.MetadataResult> metadata
-                            = result.getDriveFile().getMetadata(googleApiClient);
-                    metadata.setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
-                        @Override
-                        public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
-                            Metadata data = metadataResult.getMetadata();
-                            Log.i(TAG, "Title: " + data.getTitle());
-                            drive_id = data.getDriveId().encodeToString();
-                            Log.i(TAG, "DrivId: " + drive_id);
-                            driveID = data.getDriveId();
-                            Log.i(TAG, "Description: " + data.getDescription());
-                            Log.i(TAG, "MimeType: " + data.getMimeType());
-                            Log.i(TAG, "File size: " + String.valueOf(data.getFileSize()));
-                        }
-                    });
-                }
-            };
-
-    /*callback when there there's an error connecting the client to the service.*/
+    /**
+     * callback when there there's an error connecting the client to the service.
+     */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {
         if (!result.hasResolution()) {
@@ -348,7 +300,86 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         }
     }
 
-    /*build the google api client*/
+    /**
+     * callback on getting the drive contents, contained in result
+     */
+    final private ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback = new
+            ResultCallback<DriveApi.DriveContentsResult>() {
+                @Override
+                public void onResult(@NonNull DriveApi.DriveContentsResult result) {
+                    if (!result.getStatus().isSuccess()) {
+                        return;
+                    }
+                    final DriveContents driveContents = result.getDriveContents();
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            OutputStream outputStream = driveContents.getOutputStream();
+                            backupSMS();
+                            addTextfileToOutputStream(outputStream);
+                            MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                                    .setTitle("SMS-CSV")
+                                    .setMimeType("text/plain")
+                                    .setDescription("This is your sms backup")
+                                    .setStarred(true).build();
+                            Drive.DriveApi.getRootFolder(googleApiClient)
+                                    .createFile(googleApiClient, changeSet, driveContents)
+                                    .setResultCallback(fileCallback);
+                        }
+
+                    }.start();
+                }
+            };
+
+    /**
+     * get input stream from text file, read it and put into the output stream
+     */
+    private void addTextfileToOutputStream(OutputStream outputStream) {
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        try {
+            BufferedInputStream inputStream = new BufferedInputStream(
+                    new FileInputStream(backUpSms));
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * callback after creating the file, can get file info out of the result
+     */
+    final private ResultCallback<DriveFolder.DriveFileResult> fileCallback = new
+            ResultCallback<DriveFolder.DriveFileResult>() {
+                @Override
+                public void onResult(@NonNull DriveFolder.DriveFileResult result) {
+                    if (!result.getStatus().isSuccess()) {
+                        Toast.makeText(MainActivity.this,
+                                "Error Syncing to Drive", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Toast.makeText(MainActivity.this,
+                            "Messages Synced to Drive", Toast.LENGTH_SHORT).show();
+                    final PendingResult<DriveResource.MetadataResult> metadata
+                            = result.getDriveFile().getMetadata(googleApiClient);
+                    metadata.setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                        @Override
+                        public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
+                            Metadata data = metadataResult.getMetadata();
+                            drive_id = data.getDriveId().encodeToString();
+                            driveID = data.getDriveId();
+                        }
+                    });
+                }
+            };
+
+
+    /**
+     * build the google api client
+     */
     private void buildGoogleApiClient() {
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(this)
@@ -361,19 +392,18 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         }
     }
 
+    /**
+     * Backing Up SMS
+     */
     private void backupSMS() {
-        Uri mSmsinboxQueryUri = Uri.parse("content://sms");
+        Toast.makeText(this, "Syncing..", Toast.LENGTH_SHORT).show();
         Cursor cursor1 = getContentResolver().query(
-                mSmsinboxQueryUri,
-                new String[]{"_id", "thread_id", "address", "person", "date",
-                        "body", "type"}, null, null, null);
+                CONTENT_URI,
+                PROJECTION, null, null, null);
         //startManagingCursor(cursor1);
-        String[] columns = new String[]{"_id", "thread_id", "address", "person", "date", "body",
-                "type"};
+        String[] columns = PROJECTION;
         if (cursor1 != null) {
             if (cursor1.getCount() > 0) {
-                String count = Integer.toString(cursor1.getCount());
-                Log.d("Count", count);
                 while (cursor1.moveToNext()) {
 
                     String messageId = cursor1.getString(cursor1
@@ -404,7 +434,9 @@ public class MainActivity extends ActivityManagePermission implements MainView,
         }
     }
 
-
+    /**
+     * Writing in to a file
+     */
     private void generateCSVFileForSMS(ArrayList<String> list) {
 
         try {

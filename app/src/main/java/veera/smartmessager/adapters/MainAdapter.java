@@ -1,4 +1,4 @@
-package veera.smartmessager;
+package veera.smartmessager.adapters;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -22,13 +22,16 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import veera.smartmessager.ClickListener;
+import veera.smartmessager.R;
+import veera.smartmessager.Utils;
 
 /**
  * Created by veera on 8/8/16.
  */
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.SmsViewHolder> implements View.OnClickListener {
 
-    private Context context;
+    public static final String DD_MMM = "dd MMM";
     private LayoutInflater inflater;
     private Cursor cursor;
     private TypedArray ids;
@@ -37,7 +40,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.SmsViewHolder>
     private TextAppearanceSpan highlightSpan;
 
     public MainAdapter(Context context) {
-        this.context = context;
         listener = (ClickListener) context;
         inflater = LayoutInflater.from(context);
         ids = context.getResources().obtainTypedArray(R.array.random_background);
@@ -62,7 +64,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.SmsViewHolder>
         cursor.moveToPosition(position);
         holder.contact.setText(cursor.getString(cursor.getColumnIndex(Telephony.Sms.ADDRESS)));
         String itemValue = cursor.getString(cursor.getColumnIndex(Telephony.Sms.BODY));
-        holder.timestamp.setText(Utils.getDate(cursor.getLong(cursor.getColumnIndex(Telephony.Sms.DATE)), "dd MMM"));
+        holder.timestamp.setText(Utils.getDate(cursor.getLong(cursor.getColumnIndex(Telephony.Sms.DATE)), DD_MMM));
         holder.root.setTag(R.id.address, cursor.getString(cursor.getColumnIndex(Telephony.Sms.ADDRESS)));
         holder.root.setTag(R.id.position, position);
         holder.contactImage.setBackgroundResource(ids.getResourceId(position % 3, 0));
@@ -70,7 +72,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.SmsViewHolder>
         int startPos = itemValue.toLowerCase(Locale.US).indexOf(filterText.toLowerCase(Locale.US));
         int endPos = startPos + filterText.length();
 
-        if (startPos != -1) // This should always be true, just a sanity check
+        if (startPos != -1) //just a sanity check
         {
             Spannable spannable = new SpannableString(itemValue);
             spannable.setSpan(highlightSpan, startPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -91,8 +93,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.SmsViewHolder>
         switch (v.getId()) {
             case R.id.rootView:
                 String address = (String) v.getTag(R.id.address);
-                int position = (Integer) v.getTag(R.id.position);
-                listener.onClick(position, address);
+                listener.onClick(address);
                 break;
         }
     }

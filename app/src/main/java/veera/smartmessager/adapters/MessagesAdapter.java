@@ -1,4 +1,4 @@
-package veera.smartmessager;
+package veera.smartmessager.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import veera.smartmessager.R;
+import veera.smartmessager.Utils;
 
 /**
  * Created by veera on 8/8/16.
@@ -22,7 +24,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private LayoutInflater inflater;
     final int MESSAGE_SENT = 2;
     final int MESSAGE_RECEIVED = 1;
-    public static final String HTML_NON_BREAKING_SPACES_FOR_SEND = " &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
     public static final String HTML_NON_BREAKING_SPACES_FOR_RECEIVE = " &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
 
     public MessagesAdapter(Context context) {
@@ -41,6 +42,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case 1:
                 return MESSAGE_RECEIVED;
             case 2:
+            case 3:
+            case 4:
+            case 5:
                 return MESSAGE_SENT;
             default:
                 return super.getItemViewType(position);

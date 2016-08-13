@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="veera.smartmessager.MainActivity">
+    tools:context=".activities.MainActivity">
     <item
         android:id="@+id/search"
         android:icon="@drawable/search_bar"
@@ -13,9 +13,4 @@
         android:icon="@drawable/ic_sync"
         android:title="@string/sync"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
 </menu>

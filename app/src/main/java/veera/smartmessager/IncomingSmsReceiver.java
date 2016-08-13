@@ -8,10 +8,12 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.telephony.SmsMessage;
-import android.util.Log;
-import android.widget.Toast;
+
+import veera.smartmessager.activities.MainActivity;
+import veera.smartmessager.activities.MessagesActivity;
 
 /**
  * Created by veera on 11/8/16.
@@ -45,11 +47,10 @@ public class IncomingSmsReceiver extends BroadcastReceiver {
                     inboxStyle.addLine(message).setSummaryText(message).setBigContentTitle(phoneNumber);
 
                     bigTextStyle.setSummaryText(message).bigText(message).setBigContentTitle(phoneNumber);
-
-                    Toast.makeText(context, phoneNumber + " :" + message, Toast.LENGTH_SHORT).show();
                     notificationBuilder
                             .setSmallIcon(R.drawable.ic_launcher)
                             .setTicker(message)
+                            .setColor(ContextCompat.getColor(context, R.color.colorAccent))
                             .setContentTitle(phoneNumber)
                             .setContentText(message)
                             .setNumber(0)
@@ -65,7 +66,7 @@ public class IncomingSmsReceiver extends BroadcastReceiver {
                             new Intent[]{backIntent, messageIntent}, PendingIntent.FLAG_ONE_SHOT);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
-                        notificationBuilder.setPriority(Notification.PRIORITY_MAX);
+                        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
                         notificationBuilder.setVibrate(new long[0]);
                         notificationBuilder.setAutoCancel(true);
                     }
@@ -75,7 +76,7 @@ public class IncomingSmsReceiver extends BroadcastReceiver {
                 }
             }
         } catch (Exception e) {
-            Log.d(TAG, e.toString());
+            e.printStackTrace();
         }
     }
 }
