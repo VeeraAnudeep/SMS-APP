@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartMessager</string>
+    <string name="app_name">SMS-D</string>
     <string name="action_settings">Settings</string>
     <string name="type_message">Type Message</string>
     <string name="search">Search</string>
