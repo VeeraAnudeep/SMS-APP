@@ -8,4 +8,4 @@ ButterKnife works with annotation. It is used to automatically cast the correspo
 
 Used Google Drive API to back up SMS as a CSV file to user's Google Drive
 
-<a href="url"><img src="/Screenshot.png" align="center" height="420" width="240" ></a>
+<a href="#"><img src="/Screenshot.png" align="center" height="420" width="240" ></a>
