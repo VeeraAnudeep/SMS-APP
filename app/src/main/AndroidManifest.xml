@@ -32,6 +32,7 @@
             android:name=".activities.MessagesActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".activities.NewMessageActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 

@@ -73,7 +73,6 @@ public class MainActivity extends ActivityManagePermission implements ClickListe
 
     private static final int REQUEST_CODE = 101;
     public ArrayList<String> smsBuffer = new ArrayList<>();
-    private String smsFile = "SMS" + ".csv";
     private File backUpSms;
     private GoogleApiClient googleApiClient;
     public String drive_id;
@@ -440,6 +439,7 @@ public class MainActivity extends ActivityManagePermission implements ClickListe
     private void generateCSVFileForSMS(ArrayList<String> list) {
 
         try {
+            String smsFile = "SMS" + ".csv";
             backUpSms = new File(Environment.getExternalStorageDirectory()
                     + File.separator + smsFile);
             String storage_path = Environment.getExternalStorageDirectory().toString() + File.separator + smsFile;
