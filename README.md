@@ -9,4 +9,4 @@ ButterKnife works with annotation. It is used to automatically cast the correspo
 Used Google Drive API to back up SMS to user's Google Drive
 
 
-![Alt text](/Screenshot.png?raw=true "SMS-G")
+![Alt text](/Screenshot.png "SMS-G")
