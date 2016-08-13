@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,6 +50,8 @@ public class NewMessageActivity extends MessagesBaseActivity implements View.OnC
                 String address = phone.getText().toString().trim();
                 sendSms(address, message);
                 editText.setText("");
+                Toast.makeText(this, "Sending..", Toast.LENGTH_SHORT).show();
+                finish();
                 break;
         }
     }
