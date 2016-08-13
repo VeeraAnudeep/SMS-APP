@@ -47,7 +47,7 @@ public class NewMessageActivity extends MessagesBaseActivity implements View.OnC
             case R.id.iv_send_msg:
                 String message = editText.getText().toString().trim();
                 String address = phone.getText().toString().trim();
-                sendSms(message, address);
+                sendSms(address, message);
                 editText.setText("");
                 break;
         }
