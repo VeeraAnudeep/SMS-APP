@@ -388,6 +388,8 @@ public class MainActivity extends ActivityManagePermission implements ClickListe
                     .addOnConnectionFailedListener(this)
                     .build();
             googleApiClient.connect();
+        }else{
+            googleApiClient.connect();
         }
     }
 
@@ -395,7 +397,6 @@ public class MainActivity extends ActivityManagePermission implements ClickListe
      * Backing Up SMS
      */
     private void backupSMS() {
-        Toast.makeText(this, "Syncing..", Toast.LENGTH_SHORT).show();
         Cursor cursor1 = getContentResolver().query(
                 CONTENT_URI,
                 PROJECTION, null, null, null);
